@@ -83,7 +83,7 @@ export default function App() {
     setIsLoading(true);
     setStatus("");
     try {
-      const response = await fetch("http://localhost:5000/send", {
+      const response = await fetch("https://nutrition-backend-tmt3.onrender.com", {
         method: "POST",
         body: formData,
       });

@@ -24,7 +24,6 @@ export default function App() {
   const [contactsCount, setContactsCount] = useState(0);
   const [fieldMapping, setFieldMapping] = useState({ Name: false, Email: false });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("");
 
   const templates = [
     "Hello Sir/Mam (Name), this is your update.",

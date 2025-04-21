@@ -83,7 +83,7 @@ export default function App() {
     setIsLoading(true);
     setStatus("");
     try {
-      const response = await fetch("https://nutrition-backend-tmt3.onrender.com/send", {
+      const response = await fetch("https://your-backend-url.com/send", {
         method: "POST",
         body: formData,
       });
@@ -161,59 +161,50 @@ export default function App() {
             {imagePreview && imageFile?.type?.startsWith("image/") && (
               <>
                 <button
-                  className="image-view-btn"
+                  className="btn-preview"
                   type="button"
                   onClick={() => window.open(imagePreview, "_blank")}
                 >
-                  🔍 View Uploaded Image
+                  <FaPaperPlane /> Preview
                 </button>
-                <div className="image-preview">
-                  <img src={imagePreview} alt="Preview" />
-                </div>
+                <img src={imagePreview} alt="Preview" className="image-preview" />
               </>
             )}
           </div>
 
           <div className="input-group">
-            <label><FaRegCommentDots /> Choose Template</label>
-            <select value={selectedTemplate} onChange={(e) => {
-              setSelectedTemplate(e.target.value);
-              setMessage(e.target.value);
-            }}>
-              <option value="">-- Select Template --</option>
-              {templates.map((t, idx) => <option key={idx} value={t}>{t}</option>)}
-            </select>
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="message"><FaRegCommentDots /> Enter Your Message</label>
+            <label><FaRegCommentDots /> Your Message</label>
             <textarea
-              id="message"
-              rows="4"
+              rows="5"
+              placeholder="Write a personalized message here"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              required
-              placeholder="Enter your message here..."
             ></textarea>
           </div>
 
-          {message && fieldMapping.Name && (
-            <div className="info preview-msg">
-              ✉️ Preview: {message.replace("(Name)", "Argha Khawas")}
-            </div>
-          )}
+          <div className="input-group">
+            <label><FaRegCommentDots /> Select Template</label>
+            <select value={selectedTemplate} onChange={(e) => setSelectedTemplate(e.target.value)}>
+              <option value="">Select Template</option>
+              {templates.map((template, index) => (
+                <option key={index} value={template}>{template}</option>
+              ))}
+            </select>
+          </div>
 
-          <button type="submit" className="submit-btn" disabled={isLoading}>
-            {isLoading ? <><FaSpinner className="spinner" /> Sending...</> : <><FaPaperPlane /> Send Messages</>}
-          </button>
+          <div className="action">
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? <FaSpinner className="loading" /> : <FaPaperPlane />} Send Emails
+            </button>
+          </div>
         </form>
 
         {status && (
-          <div className={`status-banner ${status.startsWith("✅") ? "success" : "error"}`}>
-            {status}
+          <div className="status">
+            <p>{status}</p>
             {logUrl && (
-              <a href={logUrl} download className="log-link">
-                <FaDownload style={{ marginLeft: "8px" }} /> Download Log
+              <a href={logUrl} target="_blank" rel="noopener noreferrer">
+                📜 View Log
               </a>
             )}
           </div>

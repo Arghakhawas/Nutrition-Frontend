@@ -83,7 +83,7 @@ export default function App() {
     setIsLoading(true);
     setStatus("");
     try {
-      const response = await fetch("https://nutrition-backend-tmt3.onrender.com", {
+      const response = await fetch("https://nutrition-backend-tmt3.onrender.com/send", {
         method: "POST",
         body: formData,
       });
@@ -172,7 +172,6 @@ export default function App() {
                 </div>
               </>
             )}
-           
           </div>
 
           <div className="input-group">
@@ -213,7 +212,7 @@ export default function App() {
           <div className={`status-banner ${status.startsWith("✅") ? "success" : "error"}`}>
             {status}
             {logUrl && (
-              <a href={`http://localhost:5000${logUrl}`} download className="log-link">
+              <a href={logUrl} download className="log-link">
                 <FaDownload style={{ marginLeft: "8px" }} /> Download Log
               </a>
             )}

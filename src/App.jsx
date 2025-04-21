@@ -129,93 +129,56 @@ export default function App() {
 
       <div className="form-container animate-slide">
         <h1 className="title">📤 Nutrition By Argha</h1>
-        <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="form">
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
           <div className="input-group">
-            <label><FaFileExcel /> Upload Excel File (Drag & Drop)</label>
-            <Dropzone onDrop={handleDrop}>
+            <label htmlFor="excel-upload">
+              <FaFileExcel /> Upload Excel File
+            </label>
+            <Dropzone onDrop={handleDrop} accept=".xlsx, .xls" multiple={false}>
               {({ getRootProps, getInputProps }) => (
-                <div {...getRootProps({ className: "dropzone" })}>
-                  <input {...getInputProps()} />
-                  <p>📁 Drop Excel file here or click to select</p>
+                <div className="dropzone" {...getRootProps()}>
+                  <input {...getInputProps()} id="excel-upload" />
+                  <p>{excelFileName || "Drag & drop an Excel file here or click to select"}</p>
                 </div>
               )}
             </Dropzone>
-            {excelFileName && <small>📁 Selected: {excelFileName}</small>}
           </div>
 
-          {contactsCount > 0 && (
-            <>
-              <div className="info">🧾 <strong>Total Contacts:</strong> {contactsCount}</div>
-              <div className="info">✅ <strong>Detected Fields:</strong> {Object.entries(fieldMapping).filter(([_, v]) => v).map(([k]) => k).join(", ")}</div>
-            </>
-          )}
-
-          <div className="input-group">
-            <label htmlFor="imageFile"><FaImage /> Select Image/PDF (Optional)</label>
-            <input
-              type="file"
-              id="imageFile"
-              accept="image/*,.pdf"
-              onChange={handleImageChange}
-            />
-            {imagePreview && imageFile?.type?.startsWith("image/") && (
-              <>
-                <button
-                  className="image-view-btn"
-                  type="button"
-                  onClick={() => window.open(imagePreview, "_blank")}
-                >
-                  🔍 View Uploaded Image
-                </button>
-                <div className="image-preview">
-                  <img src={imagePreview} alt="Preview" />
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="input-group">
-            <label><FaRegCommentDots /> Choose Template</label>
-            <select value={selectedTemplate} onChange={(e) => {
-              setSelectedTemplate(e.target.value);
-              setMessage(e.target.value);
-            }}>
-              <option value="">-- Select Template --</option>
-              {templates.map((t, idx) => <option key={idx} value={t}>{t}</option>)}
-            </select>
-          </div>
-
-          <div className="input-group">
-            <label htmlFor="message"><FaRegCommentDots /> Enter Your Message</label>
-            <textarea
-              id="message"
-              rows="4"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-              placeholder="Enter your message here..."
-            ></textarea>
-          </div>
-
-          {message && fieldMapping.Name && (
-            <div className="info preview-msg">
-              ✉️ Preview: {message.replace("(Name)", "Argha Khawas")}
+          {imagePreview && (
+            <div className="image-preview">
+              <img src={imagePreview} alt="Preview" />
+              <button type="button" onClick={() => setImageFile(null)}>Remove Image</button>
             </div>
           )}
 
-          <button type="submit" className="submit-btn" disabled={isLoading}>
-            {isLoading ? <><FaSpinner className="spinner" /> Sending...</> : <><FaPaperPlane /> Send Messages</>}
-          </button>
+          <div className="input-group">
+            <label htmlFor="message">
+              <FaRegCommentDots /> Message Content
+            </label>
+            <textarea
+              id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message here"
+            ></textarea>
+          </div>
+
+          <div className="action-buttons">
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              disabled={isLoading || !excelFile || !message.trim()}
+            >
+              {isLoading ? <FaSpinner className="spin" /> : <FaPaperPlane />} Send Emails
+            </button>
+          </div>
         </form>
 
-        {status && (
-          <div className={`status-banner ${status.startsWith("✅") ? "success" : "error"}`}>
-            {status}
-            {logUrl && (
-              <a href={logUrl} download className="log-link">
-                <FaDownload style={{ marginLeft: "8px" }} /> Download Log
-              </a>
-            )}
+        {logUrl && (
+          <div className="log">
+            <a href={logUrl} target="_blank" rel="noopener noreferrer">
+              <FaDownload /> Download Log
+            </a>
           </div>
         )}
       </div>

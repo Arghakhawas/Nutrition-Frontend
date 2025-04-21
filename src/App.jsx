@@ -24,6 +24,7 @@ export default function App() {
   const [contactsCount, setContactsCount] = useState(0);
   const [fieldMapping, setFieldMapping] = useState({ Name: false, Email: false });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("");
 
   const templates = [
     "Hello Sir/Mam (Name), this is your update.",
@@ -128,56 +129,93 @@ export default function App() {
 
       <div className="form-container animate-slide">
         <h1 className="title">📤 Nutrition By Argha</h1>
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="form">
           <div className="input-group">
-            <label htmlFor="excel-upload">
-              <FaFileExcel /> Upload Excel File
-            </label>
-            <Dropzone onDrop={handleDrop} accept=".xlsx, .xls" multiple={false}>
+            <label><FaFileExcel /> Upload Excel File (Drag & Drop)</label>
+            <Dropzone onDrop={handleDrop}>
               {({ getRootProps, getInputProps }) => (
-                <div className="dropzone" {...getRootProps()}>
-                  <input {...getInputProps()} id="excel-upload" />
-                  <p>{excelFileName || "Drag & drop an Excel file here or click to select"}</p>
+                <div {...getRootProps({ className: "dropzone" })}>
+                  <input {...getInputProps()} />
+                  <p>📁 Drop Excel file here or click to select</p>
                 </div>
               )}
             </Dropzone>
+            {excelFileName && <small>📁 Selected: {excelFileName}</small>}
           </div>
 
-          {imagePreview && (
-            <div className="image-preview">
-              <img src={imagePreview} alt="Preview" />
-              <button type="button" onClick={() => setImageFile(null)}>Remove Image</button>
-            </div>
+          {contactsCount > 0 && (
+            <>
+              <div className="info">🧾 <strong>Total Contacts:</strong> {contactsCount}</div>
+              <div className="info">✅ <strong>Detected Fields:</strong> {Object.entries(fieldMapping).filter(([_, v]) => v).map(([k]) => k).join(", ")}</div>
+            </>
           )}
 
           <div className="input-group">
-            <label htmlFor="message">
-              <FaRegCommentDots /> Message Content
-            </label>
+            <label htmlFor="imageFile"><FaImage /> Select Image/PDF (Optional)</label>
+            <input
+              type="file"
+              id="imageFile"
+              accept="image/*,.pdf"
+              onChange={handleImageChange}
+            />
+            {imagePreview && imageFile?.type?.startsWith("image/") && (
+              <>
+                <button
+                  className="image-view-btn"
+                  type="button"
+                  onClick={() => window.open(imagePreview, "_blank")}
+                >
+                  🔍 View Uploaded Image
+                </button>
+                <div className="image-preview">
+                  <img src={imagePreview} alt="Preview" />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="input-group">
+            <label><FaRegCommentDots /> Choose Template</label>
+            <select value={selectedTemplate} onChange={(e) => {
+              setSelectedTemplate(e.target.value);
+              setMessage(e.target.value);
+            }}>
+              <option value="">-- Select Template --</option>
+              {templates.map((t, idx) => <option key={idx} value={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="message"><FaRegCommentDots /> Enter Your Message</label>
             <textarea
               id="message"
+              rows="4"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message here"
+              required
+              placeholder="Enter your message here..."
             ></textarea>
           </div>
 
-          <div className="action-buttons">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(true)}
-              disabled={isLoading || !excelFile || !message.trim()}
-            >
-              {isLoading ? <FaSpinner className="spin" /> : <FaPaperPlane />} Send Emails
-            </button>
-          </div>
+          {message && fieldMapping.Name && (
+            <div className="info preview-msg">
+              ✉️ Preview: {message.replace("(Name)", "Argha Khawas")}
+            </div>
+          )}
+
+          <button type="submit" className="submit-btn" disabled={isLoading}>
+            {isLoading ? <><FaSpinner className="spinner" /> Sending...</> : <><FaPaperPlane /> Send Messages</>}
+          </button>
         </form>
 
-        {logUrl && (
-          <div className="log">
-            <a href={logUrl} target="_blank" rel="noopener noreferrer">
-              <FaDownload /> Download Log
-            </a>
+        {status && (
+          <div className={`status-banner ${status.startsWith("✅") ? "success" : "error"}`}>
+            {status}
+            {logUrl && (
+              <a href={logUrl} download className="log-link">
+                <FaDownload style={{ marginLeft: "8px" }} /> Download Log
+              </a>
+            )}
           </div>
         )}
       </div>
